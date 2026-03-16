@@ -1,7 +1,6 @@
 "use client";
 import ActionButton from "@/components/ActionButton";
 import EditText, { IconType } from "@/components/EditText";
-import { HeartPulseIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function page() {
@@ -11,59 +10,85 @@ export default function page() {
 	const [hospitalId, setHospitalId] = useState("");
 
 	return (
-		<div className="w-full h-screen flex items-center justify-center bg-background">
-			<div className="flex flex-col items-center w-full max-w-100 h-min p-2 m-5 shadow-xl transition delay-100 duration-200 ease-in-out hover:shadow-2xl rounded-lg">
-				<HeartPulseIcon className="w-8 h-8 text-primary" />
-				<h1 className="text-xl font-bold">Cross-Cutting</h1>
-				<p className="text-sm text-greyText mb-8">
-					Secure Staff Access
-				</p>
-				<h1 className="text-xl font-bold">
+		<div className="flex min-h-screen items-center justify-center bg-background p-4">
+			<div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
+				<div className="mb-4 flex items-center gap-2">
+					<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
+						H
+					</div>
+					<div>
+						<p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+							Hospital Portal
+						</p>
+						<p className="text-lg font-semibold text-slate-900">
+							Mental Health Assessment
+						</p>
+					</div>
+				</div>
+				<h1 className="text-2xl font-semibold text-slate-900">
 					{isLogin ? "Welcome Back" : "Create Account"}
 				</h1>
-				<p className="text-sm text-center text-greyText mb-8">
+				<p className="mt-1 text-sm text-slate-500">
 					{isLogin
-						? "Please sign in to your account"
-						: "Create a new account to get started"}
+						? "Secure sign in for doctors and clinicians."
+						: "Create your account to begin assessments."}
 				</p>
-				{!isLogin && (
+
+				<div className="mt-4 space-y-2">
+					{!isLogin && (
+						<EditText
+							name="Full Name"
+							icon={IconType.person}
+							placeholder="Dr. Name"
+							value={name}
+							onChange={setName}
+						/>
+					)}
 					<EditText
-						name="Name"
-						icon={IconType.person}
-						placeholder="Your Name"
-						value={name}
-						onChange={setName}
+						name="Email"
+						icon={IconType.mail}
+						placeholder="you@hospital.org"
+						value={email}
+						onChange={setEmail}
+						type="email"
 					/>
-				)}
-				<EditText
-					name="Email Address"
-					icon={IconType.mail}
-					placeholder="email@srmist.edu.in"
-					value={email}
-					onChange={setEmail}
-				/>
-				<EditText
-					name="Hospital ID"
-					icon={IconType.hospital}
-					placeholder="Hospital ID"
-					value={hospitalId}
-					onChange={setHospitalId}
-				/>
-				<p className="text-sm text-center text-greyText mb-4">
-					{isLogin
-						? "Don't have an account? "
-						: "Already have an account? "}
+					<EditText
+						name="Hospital ID"
+						icon={IconType.hospital}
+						placeholder="H-12345"
+						value={hospitalId}
+						onChange={setHospitalId}
+					/>
+					{isLogin && (
+						<EditText
+							name="Password"
+							icon={IconType.lock}
+							placeholder="••••••••"
+							value=""
+							onChange={() => {}}
+							type="password"
+						/>
+					)}
+				</div>
+
+				<div className="mt-4">
+					<ActionButton
+						text={isLogin ? "Sign In" : "Register"}
+						onClick={() => {}}
+					/>
+				</div>
+				<p className="mt-3 text-center text-sm text-slate-500">
+					{isLogin ? "Don't have an account?" : "Already registered?"}{" "}
 					<span
-						onClick={() => setIsLogin(!isLogin)}
 						className="text-primary cursor-pointer"
+						onClick={() => setIsLogin(!isLogin)}
 					>
-						{isLogin ? "Register here" : "Sign in here"}
+						{isLogin ? "Create one" : "Sign in"}
 					</span>
 				</p>
-				<ActionButton
-					text={isLogin ? "Sign In" : "Register"}
-					onClick={() => {}}
-				/>
+				<div className="mt-4 flex justify-center text-xs text-slate-400">
+					For demo only · No backend connected
+				</div>
 			</div>
 		</div>
 	);
