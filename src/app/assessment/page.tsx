@@ -1,16 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import { patients } from "@/lib/mockData";
 import ActionButton from "@/components/ActionButton";
+import { isSignedIn } from "@/lib/auth";
 
 const tests = ["PHQ-9", "GAD-7", "DASS-21", "PTSD Checklist"];
 
 export default function AssessmentPage() {
+	const router = useRouter();
 	const [patientId, setPatientId] = useState(patients[0].id);
 	const [testType, setTestType] = useState(tests[0]);
 	const [doctorNote, setDoctorNote] = useState("");
+
+	useEffect(() => {
+		if (!isSignedIn()) router.replace("/login");
+	}, [router]);
 
 	return (
 		<div className="min-h-screen bg-background text-slate-900">
@@ -31,12 +38,6 @@ export default function AssessmentPage() {
 									clinical sessions
 								</p>
 							</div>
-							<Link
-								href="/dashboard"
-								className="text-sm text-primary font-semibold"
-							>
-								Back to dashboard
-							</Link>
 						</div>
 
 						<div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -92,17 +93,17 @@ export default function AssessmentPage() {
 							</div>
 						</div>
 
-						<div className="mt-4 flex flex-wrap gap-2">
-							<Link href="/assessment/questionnaire">
-								<ActionButton
-									text="Proceed to Questionnaire"
-									onClick={() => {}}
-								/>
-							</Link>
+						<div className="mt-4 flex flex-col flex-wrap gap-2">
 							<ActionButton
-								text="Save Draft"
+								text="Proceed to Questionnaire"
+								onClick={() =>
+									router.push("/assessment/questionnaire")
+								}
+							/>
+							<ActionButton
+								text="Go Home"
 								variant="ghost"
-								onClick={() => {}}
+								onClick={() => router.push("/")}
 							/>
 						</div>
 					</div>

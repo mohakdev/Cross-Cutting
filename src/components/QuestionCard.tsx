@@ -35,9 +35,6 @@ export default function QuestionCard({
 					>
 						<div className="flex items-center justify-between gap-3">
 							<span>{opt.label}</span>
-							<span className="text-xs font-semibold text-slate-500">
-								{opt.score}
-							</span>
 						</div>
 					</button>
 				))}

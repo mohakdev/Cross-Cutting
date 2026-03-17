@@ -1,9 +1,17 @@
 "use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { assessments } from "@/lib/mockData";
 import ActionButton from "@/components/ActionButton";
+import { isSignedIn } from "@/lib/auth";
 
 export default function HistoryPage() {
+	const router = useRouter();
+	useEffect(() => {
+		if (!isSignedIn()) router.replace("/login");
+	}, [router]);
+
 	return (
 		<div className="min-h-screen bg-background text-slate-900">
 			<div className="mx-auto flex w-full max-w-6xl gap-4 p-4">

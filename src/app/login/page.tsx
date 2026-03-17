@@ -1,13 +1,26 @@
 "use client";
 import ActionButton from "@/components/ActionButton";
 import EditText, { IconType } from "@/components/EditText";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn, isSignedIn } from "@/lib/auth";
 
 export default function page() {
 	const [isLogin, setIsLogin] = useState(true);
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [hospitalId, setHospitalId] = useState("");
+	const router = useRouter();
+
+	useEffect(() => {
+		if (isSignedIn()) router.replace("/");
+	}, [router]);
+
+	const handleSubmit = () => {
+		signIn();
+		router.push("/");
+		console.log("Form submitted:", { name, email, hospitalId });
+	};
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -59,23 +72,15 @@ export default function page() {
 						value={hospitalId}
 						onChange={setHospitalId}
 					/>
-					{isLogin && (
-						<EditText
-							name="Password"
-							icon={IconType.lock}
-							placeholder="••••••••"
-							value=""
-							onChange={() => {}}
-							type="password"
-						/>
-					)}
 				</div>
 
 				<div className="mt-4">
 					<ActionButton
 						text={isLogin ? "Sign In" : "Register"}
-						onClick={() => {}}
+						onClick={handleSubmit}
 					/>
+					{/* <Link href="/dashboard">
+					</Link> */}
 				</div>
 				<p className="mt-3 text-center text-sm text-slate-500">
 					{isLogin ? "Don't have an account?" : "Already registered?"}{" "}

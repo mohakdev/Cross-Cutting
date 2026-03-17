@@ -1,17 +1,24 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import QuestionCard from "@/components/QuestionCard";
 import ActionButton from "@/components/ActionButton";
 import { questions } from "@/lib/mockData";
 import Link from "next/link";
+import { isSignedIn } from "@/lib/auth";
 
 export default function QuestionnairePage() {
+	const router = useRouter();
 	const [answers, setAnswers] = useState<Record<number, number>>({});
 	const totalScore = useMemo(
 		() => Object.values(answers).reduce((acc, v) => acc + v, 0),
 		[answers],
 	);
+
+	useEffect(() => {
+		if (!isSignedIn()) router.replace("/login");
+	}, [router]);
 
 	const updateAnswer = (id: number, score: number) => {
 		setAnswers((prev) => ({ ...prev, [id]: score }));
@@ -36,14 +43,6 @@ export default function QuestionnairePage() {
 									click targets.
 								</p>
 							</div>
-							<div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-right">
-								<p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-									Current total
-								</p>
-								<p className="mt-1 text-xl font-bold text-slate-800">
-									{totalScore}
-								</p>
-							</div>
 						</div>
 						<div className="mt-4 space-y-3">
 							{questions.map((q) => (
@@ -57,18 +56,13 @@ export default function QuestionnairePage() {
 								/>
 							))}
 						</div>
-						<div className="mt-4 flex gap-2">
+						<div className="mt-4 flex items-center justify-center gap-2">
 							<Link href="/results">
 								<ActionButton
-									text="Review Results"
+									text="Submit Assessment"
 									onClick={() => {}}
 								/>
 							</Link>
-							<ActionButton
-								text="Save Progress"
-								variant="ghost"
-								onClick={() => {}}
-							/>
 						</div>
 					</div>
 				</div>

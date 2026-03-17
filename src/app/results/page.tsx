@@ -1,13 +1,21 @@
 "use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import ActionButton from "@/components/ActionButton";
 import { severityMap } from "@/lib/mockData";
 import Link from "next/link";
+import { isSignedIn } from "@/lib/auth";
 
 const total = 18;
 const severity = "Moderately Severe";
 
 export default function ResultsPage() {
+	const router = useRouter();
+	useEffect(() => {
+		if (!isSignedIn()) router.replace("/login");
+	}, [router]);
+
 	return (
 		<div className="min-h-screen bg-background text-slate-900">
 			<div className="mx-auto flex w-full max-w-6xl gap-4 p-4">
@@ -95,15 +103,15 @@ export default function ResultsPage() {
 							</p>
 						</div>
 
-						<div className="mt-4 flex gap-2">
+						<div className="mt-4 flex flex-col gap-2">
 							<ActionButton
 								text="Generate PDF"
 								onClick={() => {}}
 							/>
 							<ActionButton
-								text="Save Record"
+								text="Go Home"
 								variant="ghost"
-								onClick={() => {}}
+								onClick={() => router.push("/")}
 							/>
 						</div>
 					</div>

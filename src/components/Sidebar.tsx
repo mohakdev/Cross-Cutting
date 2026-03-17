@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const items = [
-	{ href: "/dashboard", label: "Dashboard", icon: Home },
+	{ href: "/", label: "Dashboard", icon: Home },
 	{ href: "/assessment", label: "Start Assessment", icon: ClipboardList },
 	{
 		href: "/assessment/questionnaire",
