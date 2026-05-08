@@ -7,6 +7,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { authFetch } from "@/lib/authFetch";
 import { getAssessmentFormTitle } from "@/lib/assessmentForms";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { FormSkeleton, Skeleton } from "@/components/Skeleton";
 
 interface ReportResult {
   total_score: number;
@@ -281,7 +282,15 @@ function ReportContent() {
             </div>
 
             {loading && (
-              <p className="mt-4 text-sm text-slate-500">Loading report...</p>
+              <>
+                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <Skeleton key={index} className="h-24 rounded-xl" />
+                  ))}
+                </div>
+                <Skeleton className="mt-4 h-20 rounded-xl" />
+                <Skeleton className="mt-4 h-28 rounded-xl" />
+              </>
             )}
             {error && (
               <p className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
@@ -370,8 +379,11 @@ export default function ReportPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background p-4 text-sm text-slate-500">
-          Loading...
+        <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
+          <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
+            <Sidebar />
+            <FormSkeleton />
+          </div>
         </div>
       }
     >

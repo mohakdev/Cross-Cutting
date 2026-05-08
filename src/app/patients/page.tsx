@@ -4,52 +4,25 @@ import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import ActionButton from "@/components/ActionButton";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import Dropdown from "@/components/Dropdown";
 import { authFetch } from "@/lib/authFetch";
 import { useRequireAuth } from "@/lib/useRequireAuth";
 
 interface PatientItem {
   id: string;
   full_name: string;
-  dob: string | null;
-  sex: string | null;
-  phone_number: string | null;
+  uhid: string | null;
   created_at?: string;
 }
 
 interface FormState {
   fullName: string;
-  dob: string;
-  sex: string;
-  phoneNumber: string;
+  uhid: string;
 }
 
 const DEFAULT_FORM: FormState = {
   fullName: "",
-  dob: "",
-  sex: "Female",
-  phoneNumber: "",
+  uhid: "",
 };
-
-function getAgeFromDob(dob: string | null) {
-  if (!dob) return null;
-
-  const birthDate = new Date(dob);
-  if (Number.isNaN(birthDate.getTime())) return null;
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
-
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age -= 1;
-  }
-
-  return age >= 0 ? age : null;
-}
 
 export default function PatientsPage() {
   const { isLoaded, isSignedIn } = useRequireAuth();
@@ -116,6 +89,10 @@ export default function PatientsPage() {
       setError("Patient full name is required");
       return;
     }
+    if (!createForm.uhid.trim()) {
+      setError("Patient UHID is required");
+      return;
+    }
 
     setIsCreating(true);
     setError(null);
@@ -125,9 +102,7 @@ export default function PatientsPage() {
         method: "POST",
         body: JSON.stringify({
           fullName: createForm.fullName.trim(),
-          dob: createForm.dob || null,
-          sex: createForm.sex || null,
-          phoneNumber: createForm.phoneNumber.trim() || null,
+          uhid: createForm.uhid.trim(),
         }),
       });
 
@@ -158,9 +133,7 @@ export default function PatientsPage() {
     setEditingPatientId(patient.id);
     setEditForm({
       fullName: patient.full_name,
-      dob: patient.dob ?? "",
-      sex: patient.sex ?? "Other",
-      phoneNumber: patient.phone_number ?? "",
+      uhid: patient.uhid ?? "",
     });
     setError(null);
   };
@@ -176,6 +149,10 @@ export default function PatientsPage() {
       setError("Patient full name is required");
       return;
     }
+    if (!editForm.uhid.trim()) {
+      setError("Patient UHID is required");
+      return;
+    }
 
     setSavingPatientId(patientId);
     setError(null);
@@ -185,9 +162,7 @@ export default function PatientsPage() {
         method: "PATCH",
         body: JSON.stringify({
           fullName: editForm.fullName.trim(),
-          dob: editForm.dob || null,
-          sex: editForm.sex || null,
-          phoneNumber: editForm.phoneNumber.trim() || null,
+          uhid: editForm.uhid.trim(),
         }),
       });
 
@@ -285,7 +260,7 @@ export default function PatientsPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
                   Add New Patient
                 </p>
-                <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-4">
+                <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
                   <input
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm"
                     placeholder="Full Name"
@@ -298,44 +273,13 @@ export default function PatientsPage() {
                     }
                   />
                   <input
-                    type={createForm.dob ? "date" : "text"}
-                    placeholder="Date of Birth"
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm"
-                    value={createForm.dob}
-                    onFocus={(event) => {
-                      event.currentTarget.type = "date";
-                    }}
-                    onBlur={(event) => {
-                      if (!event.currentTarget.value) {
-                        event.currentTarget.type = "text";
-                      }
-                    }}
+                    placeholder="UHID"
+                    value={createForm.uhid}
                     onChange={(event) =>
                       setCreateForm((prev) => ({
                         ...prev,
-                        dob: event.target.value,
-                      }))
-                    }
-                  />
-                  <Dropdown
-                    value={createForm.sex}
-                    onChange={(value) =>
-                      setCreateForm((prev) => ({ ...prev, sex: value }))
-                    }
-                    options={[
-                      { value: "Female", label: "Female" },
-                      { value: "Male", label: "Male" },
-                      { value: "Other", label: "Other" },
-                    ]}
-                  />
-                  <input
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm"
-                    placeholder="Phone Number"
-                    value={createForm.phoneNumber}
-                    onChange={(event) =>
-                      setCreateForm((prev) => ({
-                        ...prev,
-                        phoneNumber: event.target.value,
+                        uhid: event.target.value,
                       }))
                     }
                   />
@@ -344,7 +288,7 @@ export default function PatientsPage() {
                       void handleCreatePatient();
                     }}
                     disabled={isCreating}
-                    className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white hover:opacity-95 disabled:opacity-60 md:col-span-4"
+                    className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white hover:opacity-95 disabled:opacity-60 md:col-span-2"
                   >
                     {isCreating ? "Creating..." : "Create"}
                   </button>
@@ -355,7 +299,6 @@ export default function PatientsPage() {
             <div className="mt-4 grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
               {sortedPatients.map((patient) => {
                 const isEditing = editingPatientId === patient.id;
-                const age = getAgeFromDob(patient.dob);
                 return (
                   <div
                     key={patient.id}
@@ -380,58 +323,18 @@ export default function PatientsPage() {
                         </div>
                         <div>
                           <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            Date of Birth
-                          </p>
-                          <input
-                            type="date"
-                            className="min-h-11 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm"
-                            value={editForm.dob}
-                            onChange={(event) =>
-                              setEditForm((prev) => ({
-                                ...prev,
-                                dob: event.target.value,
-                              }))
-                            }
-                          />
-                          <p className="mt-1 text-xs text-slate-500">
-                            {editForm.dob
-                              ? `Age: ${getAgeFromDob(editForm.dob) ?? "-"}`
-                              : "Age will appear after DOB is entered."}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            Sex
-                          </p>
-                          <Dropdown
-                            value={editForm.sex}
-                            onChange={(value) =>
-                              setEditForm((prev) => ({
-                                ...prev,
-                                sex: value,
-                              }))
-                            }
-                            options={[
-                              { value: "Female", label: "Female" },
-                              { value: "Male", label: "Male" },
-                              { value: "Other", label: "Other" },
-                            ]}
-                          />
-                        </div>
-                        <div>
-                          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            Phone Number
+                            UHID
                           </p>
                           <input
                             className="min-h-11 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm"
-                            value={editForm.phoneNumber}
+                            value={editForm.uhid}
                             onChange={(event) =>
                               setEditForm((prev) => ({
                                 ...prev,
-                                phoneNumber: event.target.value,
+                                uhid: event.target.value,
                               }))
                             }
-                            placeholder="e.g. +91 98765 43210"
+                            placeholder="e.g. UHID-10293"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2 pt-1">
@@ -461,19 +364,7 @@ export default function PatientsPage() {
                             {patient.full_name}
                           </p>
                           <p className="mt-1 text-sm text-slate-600">
-                            DOB:{" "}
-                            {patient.dob
-                              ? new Date(patient.dob).toLocaleDateString()
-                              : "-"}
-                          </p>
-                          <p className="text-sm text-slate-600">
-                            Sex: {patient.sex ?? "-"}
-                          </p>
-                          <p className="text-sm text-slate-600">
-                            Age: {age ?? "-"}
-                          </p>
-                          <p className="text-sm text-slate-600">
-                            Phone: {patient.phone_number ?? "-"}
+                            UHID: {patient.uhid ?? "-"}
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -519,8 +410,7 @@ export default function PatientsPage() {
                 <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.15em] text-slate-500">
                   <tr>
                     <th className="px-3 py-2">Name</th>
-                    <th className="px-3 py-2">DOB</th>
-                    <th className="px-3 py-2">Sex</th>
+                    <th className="px-3 py-2">UHID</th>
                     <th className="px-3 py-2">Actions</th>
                   </tr>
                 </thead>
@@ -553,40 +443,17 @@ export default function PatientsPage() {
                         <td className="px-3 py-2 text-sm text-slate-700">
                           {isEditing ? (
                             <input
-                              type="date"
                               className="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm"
-                              value={editForm.dob}
+                              value={editForm.uhid}
                               onChange={(event) =>
                                 setEditForm((prev) => ({
                                   ...prev,
-                                  dob: event.target.value,
+                                  uhid: event.target.value,
                                 }))
                               }
                             />
-                          ) : patient.dob ? (
-                            new Date(patient.dob).toLocaleDateString()
                           ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="px-3 py-2 text-sm text-slate-700">
-                          {isEditing ? (
-                            <Dropdown
-                              value={editForm.sex}
-                              onChange={(value) =>
-                                setEditForm((prev) => ({
-                                  ...prev,
-                                  sex: value,
-                                }))
-                              }
-                              options={[
-                                { value: "Female", label: "Female" },
-                                { value: "Male", label: "Male" },
-                                { value: "Other", label: "Other" },
-                              ]}
-                            />
-                          ) : (
-                            (patient.sex ?? "-")
+                            (patient.uhid ?? "-")
                           )}
                         </td>
                         <td className="px-3 py-2 text-sm">
@@ -640,7 +507,7 @@ export default function PatientsPage() {
                   {!loading && sortedPatients.length === 0 && (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={3}
                         className="px-3 py-4 text-sm text-slate-500"
                       >
                         No patients yet. Add one to begin assessments.
@@ -650,7 +517,7 @@ export default function PatientsPage() {
                   {loading && (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={3}
                         className="px-3 py-4 text-sm text-slate-500"
                       >
                         Loading patients...

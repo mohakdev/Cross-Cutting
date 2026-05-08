@@ -6,6 +6,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import { authFetch } from "@/lib/authFetch";
 import { getAssessmentFormTitle } from "@/lib/assessmentForms";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { TableSkeleton } from "@/components/Skeleton";
 
 interface HistoryItem {
   id: string;
@@ -14,8 +15,8 @@ interface HistoryItem {
   status: string;
   form_key?: string;
   patients:
-    | { id: string; full_name: string }
-    | { id: string; full_name: string }[]
+    | { id: string; full_name: string; uhid?: string | null }
+    | { id: string; full_name: string; uhid?: string | null }[]
     | null;
   scoring_results:
     | {
@@ -122,9 +123,6 @@ export default function HistoryPage() {
               </div>
             </div>
 
-            {loading && (
-              <p className="mt-4 text-sm text-slate-500">Loading history...</p>
-            )}
             {error && (
               <p className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
                 {error}
@@ -151,6 +149,7 @@ export default function HistoryPage() {
                     <div className="space-y-1 text-sm">
                       <p className="font-semibold text-slate-900">
                         {patient?.full_name ?? "Unknown"}
+                        {patient?.uhid ? ` (${patient.uhid})` : ""}
                       </p>
                       <p className="text-slate-600">
                         Date: {new Date(item.started_at).toLocaleDateString()}
@@ -212,7 +211,8 @@ export default function HistoryPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map((item) => {
+                  {loading && <TableSkeleton />}
+                  {!loading && history.map((item) => {
                     const patient = Array.isArray(item.patients)
                       ? item.patients[0]
                       : item.patients;
@@ -229,7 +229,8 @@ export default function HistoryPage() {
                           {new Date(item.started_at).toLocaleDateString()}
                         </td>
                         <td className="px-3 py-2 text-sm font-semibold">
-                          {patient?.full_name ?? "Unknown"}
+                          {patient?.full_name ?? "Unknown Patient"}
+                          {patient?.uhid ? ` (${patient.uhid})` : ""}
                         </td>
                         <td className="px-3 py-2 text-sm">
                           {questionnaireLabel}

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { authFetch } from "@/lib/authFetch";
 import { getAssessmentFormTitle } from "@/lib/assessmentForms";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { FormSkeleton, Skeleton } from "@/components/Skeleton";
 
 interface DomainScore {
   domain: string;
@@ -170,7 +171,19 @@ function ResultsContent() {
             </div>
 
             {loading && (
-              <p className="mt-4 text-sm text-slate-500">Loading result...</p>
+              <>
+                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <Skeleton className="h-28 rounded-xl" />
+                  <Skeleton className="h-28 rounded-xl" />
+                  <Skeleton className="h-28 rounded-xl" />
+                </div>
+                <Skeleton className="mt-4 h-20 rounded-xl" />
+                <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Skeleton key={index} className="h-16 rounded-lg" />
+                  ))}
+                </div>
+              </>
             )}
 
             {error && (
@@ -326,8 +339,11 @@ export default function ResultsPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background p-4 text-sm text-slate-500">
-          Loading...
+        <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
+          <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
+            <Sidebar />
+            <FormSkeleton />
+          </div>
         </div>
       }
     >
