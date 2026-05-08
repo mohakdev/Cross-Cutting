@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("patients")
-      .select("id, full_name, dob, sex, created_at")
+      .select("id, full_name, uhid, dob, sex, created_at")
       .eq("doctor_id", doctor.doctorId)
       .order("created_at", { ascending: false });
 
@@ -30,11 +30,14 @@ export async function POST(request: NextRequest) {
     const payload = (await request.json().catch(() => ({}))) as Record<string, unknown>;
 
     const fullName = typeof payload.fullName === "string" ? payload.fullName.trim() : "";
-    const dob = typeof payload.dob === "string" && payload.dob.trim().length > 0 ? payload.dob : null;
-    const sex = typeof payload.sex === "string" && payload.sex.trim().length > 0 ? payload.sex : null;
+    const uhid = typeof payload.uhid === "string" ? payload.uhid.trim() : "";
 
     if (!fullName) {
-      return NextResponse.json({ error: "Patient fullName is required" }, { status: 400 });
+      return NextResponse.json({ error: "Patient full name is required" }, { status: 400 });
+    }
+
+    if (!uhid) {
+      return NextResponse.json({ error: "Patient UHID is required" }, { status: 400 });
     }
 
     const supabase = getSupabaseServerClient();
@@ -42,11 +45,12 @@ export async function POST(request: NextRequest) {
       .from("patients")
       .insert({
         full_name: fullName,
-        dob,
-        sex,
+        uhid,
+        dob: null,
+        sex: null,
         doctor_id: doctor.doctorId,
       })
-      .select("id, full_name, dob, sex, created_at")
+      .select("id, full_name, uhid, dob, sex, created_at")
       .single();
 
     if (error || !data) {

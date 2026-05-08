@@ -7,6 +7,7 @@ import ActionButton from "@/components/ActionButton";
 import Link from "next/link";
 import { authFetch } from "@/lib/authFetch";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { FormSkeleton, Skeleton } from "@/components/Skeleton";
 
 interface QuestionnaireDefinition {
   title: string;
@@ -237,12 +238,28 @@ function QuestionnaireContent() {
       <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
         <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
           <Sidebar />
-          <div className="flex-1 rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm min-h-[500px] flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center gap-3">
-              <div className="w-8 h-8 rounded-full border-4 border-blue-100 border-t-primary animate-spin" />
-              <p className="text-sm font-medium text-slate-500 animate-pulse">
-                Loading questionnaire...
-              </p>
+          <div className="flex-1 space-y-5 flex-col flex max-w-3xl mx-auto xl:mx-0">
+            <div className="rounded-3xl border border-slate-200/60 bg-white p-5 sm:p-8 shadow-sm">
+              <Skeleton className="h-6 w-28" />
+              <Skeleton className="mt-4 h-8 w-72 max-w-full" />
+              <Skeleton className="mt-3 h-4 w-56" />
+              <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-5">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-7 w-20" />
+                </div>
+                <Skeleton className="mt-4 h-3 w-full rounded-full" />
+              </div>
+              <div className="mt-6 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm sm:p-6">
+                <Skeleton className="h-6 w-28" />
+                <Skeleton className="mt-5 h-6 w-full" />
+                <Skeleton className="mt-3 h-6 w-3/4" />
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Skeleton key={index} className="h-14 rounded-xl" />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -311,9 +328,7 @@ function QuestionnaireContent() {
                 />
               ) : (
                 <div className="py-10 text-center">
-                  <p className="text-[15px] font-medium text-slate-500">
-                    Loading next question...
-                  </p>
+                  <Skeleton className="mx-auto h-5 w-48" />
                 </div>
               )}
             </div>
@@ -366,8 +381,11 @@ export default function QuestionnairePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-50">
-          <div className="w-8 h-8 rounded-full border-4 border-blue-100 border-t-primary animate-spin" />
+        <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
+          <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
+            <Sidebar />
+            <FormSkeleton />
+          </div>
         </div>
       }
     >
