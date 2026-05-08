@@ -21,13 +21,18 @@ export async function PATCH(
     >;
 
     const fullName = normalizeString(payload.fullName);
-    const dob = normalizeString(payload.dob);
-    const sex = normalizeString(payload.sex);
-    const phoneNumber = normalizeString(payload.phoneNumber);
+    const uhid = normalizeString(payload.uhid);
 
     if (!fullName) {
       return NextResponse.json(
-        { error: "Patient fullName is required" },
+        { error: "Patient full name is required" },
+        { status: 400 },
+      );
+    }
+
+    if (!uhid) {
+      return NextResponse.json(
+        { error: "Patient UHID is required" },
         { status: 400 },
       );
     }
@@ -37,13 +42,13 @@ export async function PATCH(
       .from("patients")
       .update({
         full_name: fullName,
-        dob,
-        sex,
-        phone_number: phoneNumber,
+        uhid,
+        dob: null,
+        sex: null,
       })
       .eq("id", id)
       .eq("doctor_id", doctor.doctorId)
-      .select("id, full_name, dob, sex, phone_number, created_at")
+      .select("id, full_name, uhid, dob, sex, created_at")
       .maybeSingle();
 
     if (error) {
