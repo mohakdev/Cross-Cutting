@@ -8,6 +8,7 @@ import ActionButton from "@/components/ActionButton";
 import { authFetch } from "@/lib/authFetch";
 import { HospitalIcon } from "lucide-react";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { PageSkeleton, Skeleton } from "@/components/Skeleton";
 
 interface DashboardResponse {
   doctor: {
@@ -24,7 +25,10 @@ interface DashboardResponse {
     id: string;
     started_at: string;
     status: string;
-    patients: { full_name: string } | { full_name: string }[] | null;
+    patients:
+      | { full_name: string; uhid?: string | null }
+      | { full_name: string; uhid?: string | null }[]
+      | null;
     scoring_results:
       | {
           total_score: number;
@@ -89,8 +93,11 @@ export default function Home() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-primary animate-spin" />
+      <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
+          <Sidebar />
+          <PageSkeleton />
+        </div>
       </div>
     );
   }
@@ -128,23 +135,26 @@ export default function Home() {
             <StatCard
               title="Patients"
               value={
-                loading ? "..." : `${dashboard?.metrics.patientsTotal ?? 0}`
+                loading ? "" : `${dashboard?.metrics.patientsTotal ?? 0}`
               }
               detail="Total registered patients"
+              loading={loading}
             />
             <StatCard
               title="Assessments Today"
               value={
-                loading ? "..." : `${dashboard?.metrics.assessmentsToday ?? 0}`
+                loading ? "" : `${dashboard?.metrics.assessmentsToday ?? 0}`
               }
               detail="Assessments started today"
+              loading={loading}
             />
             <StatCard
               title="Avg. Score"
               value={
-                loading ? "..." : `${dashboard?.metrics.averageScore ?? 0}`
+                loading ? "" : `${dashboard?.metrics.averageScore ?? 0}`
               }
               detail="Average from recent scored sessions"
+              loading={loading}
             />
           </div>
 
@@ -183,6 +193,7 @@ export default function Home() {
                       <div>
                         <div className="text-[15px] font-bold text-slate-800">
                           {patient?.full_name ?? "Unknown Patient"}
+                          {patient?.uhid ? ` (${patient.uhid})` : ""}
                         </div>
                         <div className="text-[13px] font-medium text-slate-500">
                           DSM-5 Level 1 •{" "}
@@ -233,9 +244,23 @@ export default function Home() {
                 </div>
               )}
               {loading && (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-primary animate-spin" />
-                </div>
+                <>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4"
+                    >
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="flex-1">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="mt-2 h-3 w-28" />
+                        </div>
+                        <Skeleton className="hidden h-7 w-20 sm:block" />
+                      </div>
+                    </div>
+                  ))}
+                </>
               )}
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { authFetch } from "@/lib/authFetch";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { TableSkeleton } from "@/components/Skeleton";
 
 interface HistoryItem {
   id: string;
@@ -11,8 +12,8 @@ interface HistoryItem {
   completed_at: string | null;
   status: string;
   patients:
-    | { id: string; full_name: string }
-    | { id: string; full_name: string }[]
+    | { id: string; full_name: string; uhid?: string | null }
+    | { id: string; full_name: string; uhid?: string | null }[]
     | null;
   scoring_results:
     | {
@@ -84,9 +85,6 @@ export default function HistoryPage() {
               </div>
             </div>
 
-            {loading && (
-              <p className="mt-4 text-sm text-slate-500">Loading history...</p>
-            )}
             {error && (
               <p className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
                 {error}
@@ -106,7 +104,8 @@ export default function HistoryPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map((item) => {
+                  {loading && <TableSkeleton />}
+                  {!loading && history.map((item) => {
                     const patient = Array.isArray(item.patients)
                       ? item.patients[0]
                       : item.patients;
@@ -114,35 +113,36 @@ export default function HistoryPage() {
                       ? item.scoring_results[0]
                       : item.scoring_results;
 
-                    return (
-                      <tr key={item.id} className="border-y border-slate-100">
-                        <td className="px-3 py-2 text-sm text-slate-600">
-                          {new Date(item.started_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-3 py-2 text-sm font-semibold">
-                          {patient?.full_name ?? "Unknown"}
-                        </td>
-                        <td className="px-3 py-2 text-sm">DSM-5 Level 1</td>
-                        <td className="px-3 py-2 text-sm">
-                          {result?.total_score ?? "-"}
-                        </td>
-                        <td className="px-3 py-2 text-sm">
-                          {result?.diagnosis?.primaryDiagnosis?.label ??
-                            item.status}
-                        </td>
-                        <td className="px-3 py-2 text-sm">
-                          <button
-                            onClick={() =>
-                              router.push(`/results?sessionId=${item.id}`)
-                            }
-                            className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-700 hover:bg-slate-200"
-                          >
-                            Open
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={item.id} className="border-y border-slate-100">
+                          <td className="px-3 py-2 text-sm text-slate-600">
+                            {new Date(item.started_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-3 py-2 text-sm font-semibold">
+                            {patient?.full_name ?? "Unknown Patient"}
+                            {patient?.uhid ? ` (${patient.uhid})` : ""}
+                          </td>
+                          <td className="px-3 py-2 text-sm">DSM-5 Level 1</td>
+                          <td className="px-3 py-2 text-sm">
+                            {result?.total_score ?? "-"}
+                          </td>
+                          <td className="px-3 py-2 text-sm">
+                            {result?.diagnosis?.primaryDiagnosis?.label ??
+                              item.status}
+                          </td>
+                          <td className="px-3 py-2 text-sm">
+                            <button
+                              onClick={() =>
+                                router.push(`/results?sessionId=${item.id}`)
+                              }
+                              className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-700 hover:bg-slate-200"
+                            >
+                              Open
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   {!loading && history.length === 0 && (
                     <tr>
                       <td

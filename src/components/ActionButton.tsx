@@ -35,7 +35,7 @@ export default function ActionButton({
     >
       {isLoading ? (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-80" />
+          <span className="h-4 w-24 animate-pulse rounded-md bg-current opacity-30" />
         </div>
       ) : null}
       <span className={isLoading ? "opacity-0" : "opacity-100"}>{text}</span>
