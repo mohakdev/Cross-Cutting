@@ -10,12 +10,12 @@ import {
   type AssessmentFormKey,
 } from "@/lib/assessmentForms";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { FormSkeleton, Skeleton } from "@/components/Skeleton";
 
 interface PatientItem {
   id: string;
   full_name: string;
-  dob: string | null;
-  sex: string | null;
+  uhid: string | null;
 }
 
 export default function AssessmentPage() {
@@ -119,6 +119,17 @@ export default function AssessmentPage() {
     }
   };
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
+          <Sidebar />
+          <FormSkeleton />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 pb-28 text-slate-900 xl:pb-8 pt-4 sm:pt-8 transition-all">
       <div className="mx-auto flex w-full max-w-7xl flex-col xl:flex-row gap-6 px-4 sm:px-6">
@@ -143,22 +154,30 @@ export default function AssessmentPage() {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50 p-4 transition-all focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-primary/50">
-                <Dropdown
-                  label="Patient"
-                  value={patientId}
-                  onChange={(value) => setPatientId(value)}
-                  options={patients.map((item) => ({
-                    value: item.id,
-                    label: item.full_name,
-                  }))}
-                  disabled={isLoadingPatients || patients.length === 0}
-                />
+                <label className="text-[12px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">
+                  Patient
+                </label>
+                {isLoadingPatients ? (
+                  <Skeleton className="h-11 w-full rounded-xl" />
+                ) : (
+                  <Dropdown
+                    value={patientId}
+                    onChange={(value) => setPatientId(value)}
+                    options={patients.map((item) => ({
+                      value: item.id,
+                      label: item.uhid
+                        ? `${item.full_name} (${item.uhid})`
+                        : item.full_name,
+                    }))}
+                    disabled={patients.length === 0}
+                  />
+                )}
                 <p className="mt-2 text-[13px] font-medium text-slate-500">
                   {isLoadingPatients
-                    ? "Loading patients..."
+                    ? ""
                     : patients.length === 0
-                      ? "No patients found. Create one first."
-                      : `${patients.length} patients available`}
+                      ? "No UHIDs found. Create one first."
+                      : `${patients.length} UHIDs available`}
                 </p>
               </div>
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50 p-4">
